@@ -2,6 +2,7 @@ import random
 import sys
 import pygame
 
+
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
 GRID_SIZE = 20
@@ -10,6 +11,7 @@ FPS = 10
 BLACK = (0, 0, 0)
 GREEN = (0, 200, 0)
 RED = (200, 0, 0)
+
 
 class Snake:
     """Represents the snake."""
@@ -51,6 +53,7 @@ class Snake:
         """Check self collision."""
         return self.positions[0] in self.positions[1:]
 
+
 class Apple:
     """Represents the apple."""
 
@@ -73,6 +76,7 @@ class Apple:
         rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
         pygame.draw.rect(surface, RED, rect)
 
+
 def handle_events(snake):
     """Handle user input."""
     for event in pygame.event.get():
@@ -91,6 +95,7 @@ def handle_events(snake):
 
     return True
 
+
 def update_game(snake, apple):
     """Update game state."""
     snake.move()
@@ -104,12 +109,14 @@ def update_game(snake, apple):
 
     return True
 
+
 def draw_game(screen, snake, apple):
     """Draw game objects."""
     screen.fill(BLACK)
     snake.draw(screen)
     apple.draw(screen)
     pygame.display.flip()
+
 
 def main():
     """Run the game."""
@@ -133,6 +140,7 @@ def main():
 
     pygame.quit()
     sys.exit()
+
 
 if __name__ == '__main__':
     main()
