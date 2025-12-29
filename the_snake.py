@@ -19,14 +19,14 @@ ALL_CELLS = {
 
 
 class GameObject:
-    """Базовый класс для всех объектов игры."""
+    """Базовый класс для объектов игры."""
 
     def __init__(self, position, body_color):
         self.position = position
         self.body_color = body_color
 
     def draw(self, surface):
-        """Метод для отрисовки объекта. Переопределяется в дочерних классах."""
+        """Метод для отрисовки объекта."""
         pass
 
 
@@ -39,7 +39,7 @@ class Apple(GameObject):
         self.randomize_position()
 
     def randomize_position(self, occupied=None):
-        """Устанавливает случайное положение яблока на поле, не попадая в occupied."""
+        """Случайная позиция яблока, не попадая в occupied."""
         if occupied is None:
             occupied = set()
         free_cells = list(ALL_CELLS - set(occupied))
@@ -57,23 +57,23 @@ class Snake(GameObject):
     """Класс змейки."""
 
     DIRECTIONS = {
-        "UP": (0, -CELL_SIZE),
-        "DOWN": (0, CELL_SIZE),
-        "LEFT": (-CELL_SIZE, 0),
-        "RIGHT": (CELL_SIZE, 0),
+        'UP': (0, -CELL_SIZE),
+        'DOWN': (0, CELL_SIZE),
+        'LEFT': (-CELL_SIZE, 0),
+        'RIGHT': (CELL_SIZE, 0),
     }
 
     OPPOSITE = {
-        "UP": "DOWN",
-        "DOWN": "UP",
-        "LEFT": "RIGHT",
-        "RIGHT": "LEFT",
+        'UP': 'DOWN',
+        'DOWN': 'UP',
+        'LEFT': 'RIGHT',
+        'RIGHT': 'LEFT',
     }
 
     def __init__(self):
         self.length = 1
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
-        self.direction = "RIGHT"
+        self.direction = 'RIGHT'
         self.next_direction = None
         self.body_color = GREEN
         self.last = None
@@ -84,10 +84,7 @@ class Snake(GameObject):
 
     def update_direction(self):
         """Обновляет направление движения змейки."""
-        if (
-            self.next_direction
-            and self.next_direction != self.OPPOSITE[self.direction]
-        ):
+        if self.next_direction and self.next_direction != self.OPPOSITE[self.direction]:
             self.direction = self.next_direction
         self.next_direction = None
 
@@ -95,10 +92,7 @@ class Snake(GameObject):
         """Передвигает змейку на одну клетку."""
         dx, dy = self.DIRECTIONS[self.direction]
         head_x, head_y = self.get_head_position()
-        new_head = (
-            (head_x + dx) % SCREEN_WIDTH,
-            (head_y + dy) % SCREEN_HEIGHT,
-        )
+        new_head = ((head_x + dx) % SCREEN_WIDTH, (head_y + dy) % SCREEN_HEIGHT)
 
         if new_head in self.positions[1:]:
             self.reset()
@@ -145,19 +139,20 @@ def handle_keys(snake):
                 pygame.quit()
                 sys.exit()
             elif event.key == pygame.K_UP:
-                snake.next_direction = "UP"
+                snake.next_direction = 'UP'
             elif event.key == pygame.K_DOWN:
-                snake.next_direction = "DOWN"
+                snake.next_direction = 'DOWN'
             elif event.key == pygame.K_LEFT:
-                snake.next_direction = "LEFT"
+                snake.next_direction = 'LEFT'
             elif event.key == pygame.K_RIGHT:
-                snake.next_direction = "RIGHT"
+                snake.next_direction = 'RIGHT'
 
 
 def main():
+    """Основная функция игры."""
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Изгиб Питона")
+    pygame.display.set_caption('Изгиб Питона')
     clock = pygame.time.Clock()
 
     snake = Snake()
@@ -179,5 +174,5 @@ def main():
         clock.tick(FPS)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
