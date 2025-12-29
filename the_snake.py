@@ -6,7 +6,7 @@ import pygame
 
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
-GRID_SIZE = 20
+CELL_SIZE = 20
 FPS = 10
 
 BLACK = (0, 0, 0)
@@ -14,126 +14,123 @@ GREEN = (0, 200, 0)
 RED = (200, 0, 0)
 
 
-class Snake:
-    """Represents the snake."""
+ALL_CELLS = {
+    (x, y)
+    for x in range(0, SCREEN_WIDTH, CELL_SIZE)
+    for y in range(0, SCREEN_HEIGHT, CELL_SIZE)
+}
 
-    def __init__(self):
-        """Initialize the snake."""
-        self.positions = [(300, 300)]
-        self.direction = (1, 0)
-        self.grow = False
 
-    def move(self):
-        """Move the snake."""
-        head_x, head_y = self.positions[0]
-        dir_x, dir_y = self.direction
+class GameObject:
+    """Базовый класс для игровых объектов."""
 
-        new_position = (
-            (head_x + dir_x * GRID_SIZE) % SCREEN_WIDTH,
-            (head_y + dir_y * GRID_SIZE) % SCREEN_HEIGHT,
-        )
-
-        self.positions.insert(0, new_position)
-
-        if self.grow:
-            self.grow = False
-        else:
-            self.positions.pop()
-
-    def change_direction(self, direction):
-        """Change snake direction."""
-        self.direction = direction
+    def __init__(self, position):
+        self.position = position
 
     def draw(self, surface):
-        """Draw the snake."""
-        for position in self.positions:
-            rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
-            pygame.draw.rect(surface, GREEN, rect)
-
-    def collided_with_self(self):
-        """Check self collision."""
-        return self.positions[0] in self.positions[1:]
+        """Отрисовка объекта."""
+        raise NotImplementedError
 
 
-class Apple:
-    """Represents the apple."""
+class Apple(GameObject):
+    """Яблоко."""
 
-    def __init__(self):
-        """Initialize the apple."""
-        self.position = self._random_position()
+    def __init__(self, occupied):
+        super().__init__(self._get_free_position(occupied))
 
-    def _random_position(self):
-        """Generate random position."""
-        x = random.randrange(0, SCREEN_WIDTH, GRID_SIZE)
-        y = random.randrange(0, SCREEN_HEIGHT, GRID_SIZE)
-        return x, y
-
-    def respawn(self):
-        """Respawn apple."""
-        self.position = self._random_position()
+    @staticmethod
+    def _get_free_position(occupied):
+        return random.choice(tuple(ALL_CELLS - set(occupied)))
 
     def draw(self, surface):
-        """Draw the apple."""
-        rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
+        rect = pygame.Rect(*self.position, CELL_SIZE, CELL_SIZE)
         pygame.draw.rect(surface, RED, rect)
 
 
+class Snake(GameObject):
+    """Змейка."""
+
+    def __init__(self):
+        center = (
+            SCREEN_WIDTH // 2 // CELL_SIZE * CELL_SIZE,
+            SCREEN_HEIGHT // 2 // CELL_SIZE * CELL_SIZE,
+        )
+        super().__init__(center)
+        self.segments = [center]
+        self.direction = (CELL_SIZE, 0)
+
+    def move(self):
+        head_x, head_y = self.segments[0]
+        dir_x, dir_y = self.direction
+        new_head = (
+            (head_x + dir_x) % SCREEN_WIDTH,
+            (head_y + dir_y) % SCREEN_HEIGHT,
+        )
+
+        if new_head in self.segments:
+            self.segments = [new_head]
+        else:
+            self.segments.insert(0, new_head)
+            self.segments.pop()
+
+    def grow(self):
+        self.segments.append(self.segments[-1])
+
+    def change_direction(self, new_direction):
+        opposite = (-self.direction[0], -self.direction[1])
+        if new_direction != opposite:
+            self.direction = new_direction
+
+    def draw(self, surface):
+        for segment in self.segments:
+            rect = pygame.Rect(*segment, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(surface, GREEN, rect)
+
+
 def handle_events(snake):
-    """Handle user input."""
+    """Обработка событий."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            return False
+            pygame.quit()
+            sys.exit()
 
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                sys.exit()
             if event.key == pygame.K_UP:
-                snake.change_direction((0, -1))
-            elif event.key == pygame.K_DOWN:
-                snake.change_direction((0, 1))
-            elif event.key == pygame.K_LEFT:
-                snake.change_direction((-1, 0))
-            elif event.key == pygame.K_RIGHT:
-                snake.change_direction((1, 0))
-
-    return True
-
-
-def update_game(snake, apple):
-    """Update game state."""
-    snake.move()
-
-    if snake.positions[0] == apple.position:
-        snake.grow = True
-        apple.respawn()
-
-    return not snake.collided_with_self()
-
-
-def draw_game(screen, snake, apple):
-    """Draw game objects."""
-    screen.fill(BLACK)
-    snake.draw(screen)
-    apple.draw(screen)
-    pygame.display.flip()
+                snake.change_direction((0, -CELL_SIZE))
+            if event.key == pygame.K_DOWN:
+                snake.change_direction((0, CELL_SIZE))
+            if event.key == pygame.K_LEFT:
+                snake.change_direction((-CELL_SIZE, 0))
+            if event.key == pygame.K_RIGHT:
+                snake.change_direction((CELL_SIZE, 0))
 
 
 def main():
-    """Run the game."""
+    """Главная функция игры."""
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption('Snake')
     clock = pygame.time.Clock()
 
     snake = Snake()
-    apple = Apple()
+    apple = Apple(snake.segments)
 
-    running = True
-    while running:
+    while True:
+        handle_events(snake)
+        snake.move()
+
+        if snake.segments[0] == apple.position:
+            snake.grow()
+            apple = Apple(snake.segments)
+
+        screen.fill(BLACK)
+        apple.draw(screen)
+        snake.draw(screen)
+        pygame.display.flip()
         clock.tick(FPS)
-        running = handle_events(snake) and update_game(snake, apple)
-        draw_game(screen, snake, apple)
-
-    pygame.quit()
-    sys.exit()
 
 
 if __name__ == '__main__':
