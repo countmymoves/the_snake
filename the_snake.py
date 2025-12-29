@@ -1,5 +1,6 @@
-import random
 import sys
+import random
+
 import pygame
 
 
@@ -34,10 +35,10 @@ class Snake:
 
         self.positions.insert(0, new_position)
 
-        if not self.grow:
-            self.positions.pop()
-        else:
+        if self.grow:
             self.grow = False
+        else:
+            self.positions.pop()
 
     def change_direction(self, direction):
         """Change snake direction."""
@@ -104,10 +105,7 @@ def update_game(snake, apple):
         snake.grow = True
         apple.respawn()
 
-    if snake.collided_with_self():
-        return False
-
-    return True
+    return not snake.collided_with_self()
 
 
 def draw_game(screen, snake, apple):
@@ -131,11 +129,7 @@ def main():
     running = True
     while running:
         clock.tick(FPS)
-        running = handle_events(snake)
-
-        if running:
-            running = update_game(snake, apple)
-
+        running = handle_events(snake) and update_game(snake, apple)
         draw_game(screen, snake, apple)
 
     pygame.quit()
