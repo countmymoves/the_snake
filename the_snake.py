@@ -1,6 +1,5 @@
 import random
 import sys
-
 import pygame
 
 
@@ -13,7 +12,6 @@ BLACK = (0, 0, 0)
 GREEN = (0, 200, 0)
 RED = (200, 0, 0)
 
-
 ALL_CELLS = {
     (x, y)
     for x in range(0, SCREEN_WIDTH, CELL_SIZE)
@@ -22,33 +20,35 @@ ALL_CELLS = {
 
 
 class GameObject:
-    """Базовый класс для игровых объектов."""
+    """Базовый класс игровых объектов."""
 
     def __init__(self, position):
         self.position = position
 
     def draw(self, surface):
-        """Отрисовка объекта."""
+        """Отрисовать объект на экране."""
         raise NotImplementedError
 
 
 class Apple(GameObject):
-    """Яблоко."""
+    """Класс яблока."""
 
     def __init__(self, occupied):
         super().__init__(self._get_free_position(occupied))
 
     @staticmethod
     def _get_free_position(occupied):
+        """Вернуть свободную позицию на поле."""
         return random.choice(tuple(ALL_CELLS - set(occupied)))
 
     def draw(self, surface):
+        """Отрисовать яблоко."""
         rect = pygame.Rect(*self.position, CELL_SIZE, CELL_SIZE)
         pygame.draw.rect(surface, RED, rect)
 
 
 class Snake(GameObject):
-    """Змейка."""
+    """Класс змейки."""
 
     def __init__(self):
         center = (
@@ -60,6 +60,7 @@ class Snake(GameObject):
         self.direction = (CELL_SIZE, 0)
 
     def move(self):
+        """Переместить змейку."""
         head_x, head_y = self.segments[0]
         dir_x, dir_y = self.direction
         new_head = (
@@ -74,21 +75,24 @@ class Snake(GameObject):
             self.segments.pop()
 
     def grow(self):
+        """Увеличить длину змейки."""
         self.segments.append(self.segments[-1])
 
     def change_direction(self, new_direction):
+        """Изменить направление движения."""
         opposite = (-self.direction[0], -self.direction[1])
         if new_direction != opposite:
             self.direction = new_direction
 
     def draw(self, surface):
+        """Отрисовать змейку."""
         for segment in self.segments:
             rect = pygame.Rect(*segment, CELL_SIZE, CELL_SIZE)
             pygame.draw.rect(surface, GREEN, rect)
 
 
 def handle_events(snake):
-    """Обработка событий."""
+    """Обработать пользовательский ввод."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -109,7 +113,7 @@ def handle_events(snake):
 
 
 def main():
-    """Главная функция игры."""
+    """Запуск игры."""
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption('Snake')
