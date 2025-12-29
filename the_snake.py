@@ -23,6 +23,7 @@ class GameObject:
     """Базовый класс для объектов игры."""
 
     def __init__(self, position, body_color):
+        """Инициализация объекта."""
         self.position = position
         self.body_color = body_color
 
@@ -35,6 +36,7 @@ class Apple(GameObject):
     """Класс яблока."""
 
     def __init__(self):
+        """Инициализация яблока."""
         self.body_color = RED
         self.position = (0, 0)
         self.randomize_position()
@@ -47,6 +49,7 @@ class Apple(GameObject):
         self.position = random.choice(free_cells)
 
     def draw(self, surface):
+        """Отрисовывает яблоко."""
         pygame.draw.rect(
             surface,
             self.body_color,
@@ -72,6 +75,7 @@ class Snake(GameObject):
     }
 
     def __init__(self):
+        """Инициализация змейки."""
         self.length = 1
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
         self.direction = 'RIGHT'
@@ -84,7 +88,7 @@ class Snake(GameObject):
         return self.positions[0]
 
     def update_direction(self):
-        """Обновляет направление движения змейки."""
+        """Обновляет направление змейки."""
         if self.next_direction and self.next_direction != self.OPPOSITE[self.direction]:
             self.direction = self.next_direction
         self.next_direction = None
