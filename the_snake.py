@@ -20,7 +20,6 @@ from typing import List, Optional, Tuple
 
 import pygame
 
-
 # --- Размеры экрана/сетки ---
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
@@ -119,7 +118,9 @@ class Apple(GameObject):
 
     def draw(self, surface: pygame.Surface) -> None:
         """Отрисовать яблоко на поверхности."""
-        color = self.body_color if self.body_color is not None else APPLE_COLOR
+        color = self.body_color
+        if color is None:
+            color = APPLE_COLOR
         self.draw_cell(surface, self.position, color)
 
 
@@ -198,7 +199,9 @@ class Snake(GameObject):
                 self.draw_cell(surface, pos, BOARD_BACKGROUND_COLOR)
             self._positions_to_clear = []
 
-        color = self.body_color if self.body_color is not None else SNAKE_COLOR
+        color = self.body_color
+        if color is None:
+            color = SNAKE_COLOR
         self.draw_cell(surface, self.get_head_position(), color)
 
         if self.last is not None:
