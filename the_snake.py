@@ -18,7 +18,10 @@ import sys
 from random import choice, randint
 from typing import List, Optional, Tuple
 
-import pygame
+# pygame импортируется только внутри main(), чтобы модуль можно было импортировать
+# в окружениях, где pygame отсутствует (автотесты Практикума).
+# import pygame  <-- убрано
+
 
 # --- Размеры экрана/сетки ---
 SCREEN_WIDTH = 640
@@ -79,7 +82,7 @@ class GameObject:
         self.position = position if position is not None else screen_center()
         self.body_color = body_color
 
-    def draw(self, surface: pygame.Surface) -> None:
+    def draw(self, surface) -> None:
         """Отрисовать объект.
 
         Базовый класс не знает, как рисовать потомков.
@@ -88,7 +91,7 @@ class GameObject:
 
     @staticmethod
     def draw_cell(
-        surface: pygame.Surface,
+        surface,
         position: Position,
         color: Color,
     ) -> None:
@@ -123,7 +126,7 @@ class Apple(GameObject):
                 self.position = candidate
                 return
 
-    def draw(self, surface: pygame.Surface) -> None:
+    def draw(self, surface) -> None:
         """Отрисовать яблоко на поверхности."""
         color = self.body_color
         if color is None:
@@ -199,7 +202,7 @@ class Snake(GameObject):
         self.next_direction = None
         self.last = None
 
-    def draw(self, surface: pygame.Surface) -> None:
+    def draw(self, surface) -> None:
         """Отрисовать змейку и затереть след."""
         if self._positions_to_clear:
             for pos in self._positions_to_clear:
@@ -215,7 +218,7 @@ class Snake(GameObject):
             self.draw_cell(surface, self.last, BOARD_BACKGROUND_COLOR)
 
 
-def handle_keys(snake: Snake, event: pygame.event.Event) -> None:
+def handle_keys(snake: Snake, event) -> None:
     """Обработать нажатия клавиш и назначить snake.next_direction.
 
     Запрещает разворот на 180°.
@@ -246,6 +249,11 @@ def handle_keys(snake: Snake, event: pygame.event.Event) -> None:
 
 def main() -> None:
     """Точка входа: инициализация Pygame и основной игровой цикл."""
+    # Импортируем pygame внутри main() и делаем его модульной (глобальной) переменной,
+    # чтобы при импорте этого модуля в средах без pygame (автотесты) импорт не падал.
+    global pygame
+    import pygame  # type: ignore
+
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
     pygame.display.set_caption('Snake')
