@@ -87,7 +87,11 @@ class GameObject:
         pass
 
     @staticmethod
-    def draw_cell(surface: pygame.Surface, position: Position, color: Color) -> None:
+    def draw_cell(
+        surface: pygame.Surface,
+        position: Position,
+        color: Color,
+) -> None:
         """Нарисовать одну клетку сетки заданным цветом."""
         rect = pygame.Rect(position[0], position[1], GRID_SIZE, GRID_SIZE)
         pygame.draw.rect(surface, color, rect)
@@ -101,7 +105,10 @@ class Apple(GameObject):
         super().__init__(body_color=APPLE_COLOR)
         self.randomize_position()
 
-    def randomize_position(self, occupied: Optional[List[Position]] = None) -> None:
+    def randomize_position(
+    self,
+    occupied: Optional[List[Position]] = None,
+) -> None:
         """Установить яблоко в случайную позицию.
 
         Args:
