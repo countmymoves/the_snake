@@ -18,10 +18,7 @@ import sys
 from random import choice, randint
 from typing import List, Optional, Tuple
 
-# pygame импортируется только внутри main(),
-# чтобы модуль можно было импортировать
-# в окружениях, где pygame отсутствует (автотесты Практикума).
-# import pygame  <-- убрано
+import pygame
 
 
 # --- Размеры экрана/сетки ---
@@ -52,6 +49,10 @@ RIGHT = (1, 0)
 Position = Tuple[int, int]
 Color = Tuple[int, int, int]
 Direction = Tuple[int, int]
+
+# Глобальные переменные, которые ожидают тесты.
+screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+clock = pygame.time.Clock()
 
 
 def screen_center() -> Position:
@@ -250,12 +251,7 @@ def handle_keys(snake: Snake, event) -> None:
 
 def main() -> None:
     """Точка входа: инициализация Pygame и основной игровой цикл."""
-    # Импортируем pygame внутри main(),
-    # делаем его модульной (глобальной) переменной,
-    # чтобы при импорте этого модуля
-    # в средах без pygame (автотесты) импорт не падал.
-    global pygame
-    import pygame  # type: ignore
+    global screen, clock
 
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
