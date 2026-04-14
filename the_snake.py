@@ -20,7 +20,6 @@ from typing import List, Optional, Tuple
 
 import pygame
 
-
 # --- Размеры экрана/сетки ---
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
