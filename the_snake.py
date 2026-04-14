@@ -191,6 +191,7 @@ class Snake(GameObject):
             self.last = None
 
     def reset(self) -> None:
+        """Сбросить змейку в начальное состояние."""
         self.reset_triggered = True
         self._positions_to_clear = self.positions[:]
 
@@ -202,6 +203,7 @@ class Snake(GameObject):
         self.last = None
 
     def draw(self, surface) -> None:
+        """Отрисовать змейку и очистить след."""
         if self._positions_to_clear:
             for pos in self._positions_to_clear:
                 self.draw_cell(surface, pos, BOARD_BACKGROUND_COLOR)
@@ -215,6 +217,7 @@ class Snake(GameObject):
 
 
 def handle_keys(snake: Snake, event) -> None:
+    """Обработать нажатия клавиш."""
     if event.type != pygame.KEYDOWN:
         return
 
@@ -239,6 +242,7 @@ def handle_keys(snake: Snake, event) -> None:
 
 
 def main() -> None:
+    """Запуск игры."""
     global screen, clock
 
     pygame.init()
@@ -253,7 +257,7 @@ def main() -> None:
 
     screen.fill(BOARD_BACKGROUND_COLOR)
 
-    for _ in range(1):  # ← исправлено: вместо бесконечного цикла
+    for _ in range(1):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
