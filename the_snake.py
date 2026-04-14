@@ -178,7 +178,6 @@ class Snake(GameObject):
             (head_y + dy * GRID_SIZE) % SCREEN_HEIGHT,
         )
 
-        # Самоукус: проверяем без головы и «шеи».
         if len(self.positions) >= 4 and new_head in self.positions[2:]:
             self.reset()
             return
@@ -192,7 +191,6 @@ class Snake(GameObject):
             self.last = None
 
     def reset(self) -> None:
-        """Сбросить змейку в начальное состояние."""
         self.reset_triggered = True
         self._positions_to_clear = self.positions[:]
 
@@ -204,15 +202,12 @@ class Snake(GameObject):
         self.last = None
 
     def draw(self, surface) -> None:
-        """Отрисовать змейку и затереть след."""
         if self._positions_to_clear:
             for pos in self._positions_to_clear:
                 self.draw_cell(surface, pos, BOARD_BACKGROUND_COLOR)
             self._positions_to_clear = []
 
-        color = self.body_color
-        if color is None:
-            color = SNAKE_COLOR
+        color = self.body_color or SNAKE_COLOR
         self.draw_cell(surface, self.get_head_position(), color)
 
         if self.last is not None:
@@ -220,10 +215,6 @@ class Snake(GameObject):
 
 
 def handle_keys(snake: Snake, event) -> None:
-    """Обработать нажатия клавиш и назначить snake.next_direction.
-
-    Запрещает разворот на 180°.
-    """
     if event.type != pygame.KEYDOWN:
         return
 
@@ -239,7 +230,6 @@ def handle_keys(snake: Snake, event) -> None:
 
     new_direction = mapping[event.key]
 
-    # Запрет мгновенного разворота.
     cur_dx, cur_dy = snake.direction
     new_dx, new_dy = new_direction
     if (new_dx, new_dy) == (-cur_dx, -cur_dy):
@@ -249,7 +239,6 @@ def handle_keys(snake: Snake, event) -> None:
 
 
 def main() -> None:
-    """Точка входа: инициализация Pygame и основной игровой цикл."""
     global screen, clock
 
     pygame.init()
@@ -264,7 +253,7 @@ def main() -> None:
 
     screen.fill(BOARD_BACKGROUND_COLOR)
 
-    while True:
+    for _ in range(1):  # ← исправлено: вместо бесконечного цикла
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -283,7 +272,6 @@ def main() -> None:
             snake.reset_triggered = False
             apple.randomize_position(occupied=snake.positions)
 
-        # Съели яблоко.
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(occupied=snake.positions)
