@@ -17,6 +17,7 @@ from __future__ import annotations
 import sys
 from random import choice, randint
 from typing import List, Optional, Tuple
+
 import pygame
 
 
